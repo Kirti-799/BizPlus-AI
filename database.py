@@ -3,7 +3,7 @@ import datetime
 import random
 import os
 
-DB_NAME = 'bizplus.db'
+DB_NAME = os.path.join(os.getcwd(), "bizplus.db")
 
 def get_db():
     conn = sqlite3.connect(DB_NAME)

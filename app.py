@@ -4,12 +4,17 @@ from ml_model import predict_sales
 import datetime
 from functools import wraps
 import hashlib
+import os
 
 app = Flask(__name__)
-app.secret_key = 'bizplus_secret_key_2024'
+
+app.secret_key = os.environ.get("SECRET_KEY", "fallback_secret")
 
 # Initialize DB on startup
-init_db()
+try:
+    init_db()
+except:
+    pass
 
 # ----- AUTHENTICATION LOGIC -----
 
@@ -620,4 +625,4 @@ def get_analytics_detail():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
