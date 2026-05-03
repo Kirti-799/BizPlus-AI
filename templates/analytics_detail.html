@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='analytics_detail.js') }}"></script>
+<style>
+    /* Ensure the body or a wrapper allows for scroll snap */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    .analytics-wrapper {
+        height: calc(100vh - 100px); /* adjust for navbar */
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+        padding-bottom: 5rem; /* space at bottom */
+    }
+
+    .analytics-section {
+        min-height: 80vh;
+        scroll-snap-align: start;
+        padding-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    .reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s ease-out;
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Trending / Least Sold Cards */
+    .stat-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 2rem;
+        max-width: 800px;
+    }
+    .stat-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        
+    }
+    .stat-info h3 {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .back-to-top {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--text-color);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        font-size: 1.5rem;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        pointer-events: none;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .back-to-top.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .back-to-top:hover {
+        transform: translateY(-5px);
+        background: var(--primary-color);
+    }
+    
+    /* Chart Containers */
+    .chart-container {
+        width: 100%;
+        max-width: 1000px;
+        background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--glass-shadow);
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="#top" class="back-to-top" id="backToTop">&uarr;</a>
+
+<div class="analytics-wrapper" id="analytics-scroll-container">
+
+    <!-- Section 1: Trending -->
+    <section class="analytics-section reveal" id="top">
+        <h2 class="section-title">Trending Items</h2>
+        <p style="color: var(--text-muted); margin-top: 1rem;">Top 5 best-selling products this month.</p>
+        <div class="stat-list" id="trending-container">
+            <p>Loading trending data...</p>
+        </div>
+    </section>
+
+    <!-- Section 2: Least Sold -->
+    <section class="analytics-section reveal">
+        <h2 class="section-title">Least Sold Items</h2>
+        <p style="color: var(--text-muted); margin-top: 1rem;">Products needing attention (lowest sales volume).</p>
+        <div class="stat-list" id="least-sold-container">
+            <p>Loading least sold data...</p>
+        </div>
+    </section>
+
+    <!-- Section 3: Monthly Sales -->
+    <section class="analytics-section reveal">
+        <h2 class="section-title">Monthly Sales Trend</h2>
+        <p style="color: var(--text-muted); margin-top: 1rem;">Daily revenue over the last 30 days.</p>
+        <div class="chart-container">
+            <canvas id="monthlyChartDetail"></canvas>
+        </div>
+    </section>
+
+    <!-- Section 4: Weekly Sales -->
+    <section class="analytics-section reveal" style="padding-bottom: 4rem;">
+        <h2 class="section-title">Weekly Performance</h2>
+        <p style="color: var(--text-muted); margin-top: 1rem;">Revenue over the past 7 days.</p>
+        <div class="chart-container">
+            <canvas id="weeklyChartDetail"></canvas>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

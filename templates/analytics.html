@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='analytics.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h2>Business Analytics</h2>
+    <p style="color: var(--text-muted);">Visualize your performance and trends</p>
+</div>
+
+<!-- Profit Overview Cards -->
+<div class="grid grid-4" style="margin-bottom: 3rem;">
+    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+        <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">Total Revenue (30d)</h4>
+        <h2 id="total-revenue" style="color: var(--text-color);">₹0.00</h2>
+    </div>
+    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+        <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">Total Cost (30d)</h4>
+        <h2 id="total-cost" style="color: var(--danger);">₹0.00</h2>
+    </div>
+    <div class="glass-panel" style="padding: 1.5rem; text-align: center; border-bottom: 4px solid var(--success);">
+        <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">Net Profit (30d)</h4>
+        <h2 id="net-profit" style="color: var(--success);">₹0.00</h2>
+    </div>
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">Trending Products</h4>
+        <ul id="trending-list" style="list-style: none; margin-top: 1rem; font-size: 0.9rem;">
+            <!-- Injected via analytics.js -->
+        </ul>
+    </div>
+</div>
+
+<!-- Charts Grid -->
+<div class="grid grid-2">
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="margin-bottom: 1.5rem;">Weekly Sales</h3>
+        <canvas id="weeklyChart"></canvas>
+    </div>
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="margin-bottom: 1.5rem;">Monthly Sales Trend</h3>
+        <canvas id="monthlyChart"></canvas>
+    </div>
+</div>
+{% endblock %}

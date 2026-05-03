@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='bill_history.js') }}"></script>
+<style>
+    .filter-btn {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .filter-btn.active {
+        background: var(--primary-color);
+        color: white;
+    }
+    .bill-card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    .bill-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .bill-details-container {
+        display: none;
+        margin-top: 1.5rem;
+        border-top: 1px solid var(--glass-border);
+        padding-top: 1rem;
+    }
+    .bill-details-container.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="glass-panel bill-wrapper">
+
+    <div class="bill-header-top">
+        <div>
+            <h2>Bill History</h2>
+            <p class="bill-subtext">View and manage your past transactions</p>
+        </div>
+
+        <div class="filters" id="filter-container">
+            <button class="filter-btn active" data-filter="today">Today</button>
+            <button class="filter-btn" data-filter="week">This Week</button>
+            <button class="filter-btn" data-filter="month">This Month</button>
+            <button class="filter-btn" data-filter="all">All Time</button>
+        </div>
+    </div>
+
+    <div id="bills-container">
+        <p class="loading-text">Loading bills...</p>
+    </div>
+
+</div>
+
+{% endblock %}

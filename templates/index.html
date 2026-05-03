@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizPlus AI - The Future of Business Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+    background: #2f5f7a;
+    position: relative;
+}
+
+/* SOFT BACKGROUND GLOW */
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.15), transparent 40%);
+    filter: blur(60px);
+    z-index: 0;
+}
+
+/* CLOUD BACKGROUND */
+.cloud-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.cloud {
+    position: absolute;
+    width: 300px;
+    height: 150px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: floatCloud 30s linear infinite;
+}
+
+.cloud:nth-child(1) {
+    top: 20%;
+    left: -300px;
+}
+
+.cloud:nth-child(2) {
+    top: 60%;
+    left: -400px;
+    animation-duration: 40s;
+}
+
+@keyframes floatCloud {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(120vw);
+    }
+}
+
+/* NAVBAR */
+.landing-nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 70px;
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    z-index: 100;
+}
+
+.nav-brand {
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    text-decoration: none;
+}
+
+.login-btn {
+    background: #000000;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    background: #222;
+}
+
+/* HERO SECTION */
+.hero {
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 800px;
+}
+
+.hero h1 {
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
+    font-size: clamp(2.5rem, 5vw, 64px);
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    color: rgba(255,255,255,0.85);
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+/* BUTTONS */
+.btn-start {
+    background: #ffffff;
+    color: #2f5f7a;
+    padding: 14px 32px;
+    border-radius: 30px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: 0.3s;
+}
+
+.btn-start:hover {
+    background: #000;
+    color: #fff;
+}
+
+.btn-guest {
+    background: transparent;
+    color: #ffffff;
+    padding: 14px 32px;
+    border-radius: 30px;
+    border: 2px solid rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-guest:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* FEATURES SECTION */
+.features {
+    padding: 120px 20px;
+    text-align: center;
+    color: white;
+    position: relative;
+    z-index: 2;
+}
+
+.features-title {
+    font-size: 2.5rem;
+    margin-bottom: 60px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* GRID */
+.features-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* CARD */
+.feature-card {
+    width: 240px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 25px 20px;
+    color: white;
+    transition: 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255,255,255,0.15);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.feature-card .icon {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.85);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .landing-nav {
+        padding: 0 20px;
+    }
+}
+
+/* TEXT ANIMATION */
+.fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 1s ease forwards;
+}
+
+.fade-delay-1 { animation-delay: 0.2s; }
+.fade-delay-2 { animation-delay: 0.5s; }
+.fade-delay-3 { animation-delay: 0.8s; }
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="cloud-bg">
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+</div>
+
+    <nav class="landing-nav">
+        <a href="/" class="nav-brand">BIZPLUS AI</a>
+        <div class="nav-links">
+            <a href="/login" class="login-btn">LOGIN</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+<h1 class="fade-up fade-delay-1">
+    The Future of Business Management is Here
+</h1>
+
+<p class="fade-up fade-delay-2">
+    Smart AI-powered insights to manage your business efficiently.
+</p>
+
+<div class="fade-up fade-delay-3" style="display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; justify-content: center;">
+                <button class="btn-start" onclick="window.location.href='/register'">Get Started</button>
+                <button class="btn-guest" onclick="window.location.href='/guest_login'">Continue as Guest</button>
+            </div>
+        </div>
+    </section>
+    <section class="features">
+    <h2 class="features-title">What BizzPlus AI Can Do</h2>
+
+    <div class="features-grid">
+
+        <div class="feature-card">
+            <div class="icon">📦</div>
+            <h3>Smart Inventory</h3>
+            <p>Track products, expiry dates, and pricing with automated margin calculation.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">🧾</div>
+            <h3>Billing System</h3>
+            <p>Create bills instantly and automatically update stock in real-time.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">📊</div>
+            <h3>Analytics</h3>
+            <p>Visualize daily, weekly, and monthly sales with actionable insights.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">🤖</div>
+            <h3>AI Insights</h3>
+            <p>Get smart suggestions like restocking alerts and demand predictions.</p>
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+/* static/print.css */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .navbar, 
+    .clouds-container,
+    .no-print,
+    .btn,
+    .modal-overlay {
+        display: none !important;
+    }
+
+    .glass-panel {
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .container {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+
+    /* Target specific bill print area */
+    #bill-summary-container {
+        width: 100%;
+        display: block !important;
+        border: 1px solid #ccc !important;
+        padding: 20px !important;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+}

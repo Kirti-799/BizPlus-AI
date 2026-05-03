@@ -1,0 +1,918 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+/* Dashboard Specific CSS */
+.dashboard-wrapper {
+    background: transparent;
+    min-height: 100vh;
+    padding: 80px 32px 60px 32px;
+}
+
+/* TOP STAT PILLS ROW */
+.stat-pills-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.stat-pill {
+    background: #ffffff;
+    border-radius: 30px;
+    padding: 12px 28px;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.stat-pill:hover {
+    transform: translateY(-2px);
+}
+
+.stat-pill .label {
+    font-size: 0.68rem;
+    color: #999;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: block;
+}
+
+.stat-pill .value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111;
+    margin-top: 4px;
+    display: block;
+}
+
+/* 4 QUADRANTS GRID */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* QUADRANT 1 - SMART ALERTS */
+.q1-alerts {
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    height: 320px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+}
+
+.alerts-header {
+    background: #ffffff;
+    padding: 18px 22px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.alerts-icon {
+    width: 32px;
+    height: 32px;
+    background: #fee2e2;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alerts-title {
+    font-size: 0.72rem;
+    letter-spacing: 2.5px;
+    color: #666;
+    font-weight: 600;
+    margin: 0;
+}
+
+.alerts-badge {
+    margin-left: auto;
+    background: #fee2e2;
+    color: #ef4444;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.alerts-badge.all-clear {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.alerts-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 18px;
+    scroll-behavior: smooth;
+}
+
+.alerts-scroll-area::-webkit-scrollbar {
+    width: 4px;
+}
+.alerts-scroll-area::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+.alerts-scroll-area::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+.alert-item {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    opacity: 0;
+    animation: slideInLeft 0.4s ease forwards;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.alert-item.low_stock {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+}
+
+.alert-item.out_of_stock {
+    background: #fef2f2;
+    border-left: 3px solid #ef4444;
+}
+
+.alert-item.overdue_review {
+    background: #fef2f2;
+    border-left: 3px solid #dc2626;
+}
+
+.alert-item.review_soon {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+}
+
+.alert-icon-box {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.low_stock .alert-icon-box { background: #fef3c7; color: #f59e0b; }
+.out_of_stock .alert-icon-box { background: #fee2e2; color: #ef4444; }
+.overdue_review .alert-icon-box { background: #fee2e2; color: #dc2626; }
+.review_soon .alert-icon-box { background: #fef3c7; color: #d97706; }
+
+.alert-text-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.alert-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.alert-sub {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 2px;
+}
+
+.empty-alerts {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #999;
+}
+
+/* QUADRANT 2 - WEEKLY GRAPH */
+.q2-graph {
+    border-radius: 20px;
+    overflow: hidden;
+    height: 320px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    position: relative;
+    background: #052e16;
+}
+
+.q2-graph::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+.q2-graph::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 70%, rgba(255,50,50,0.08) 0%, transparent 70%);
+}
+
+.graph-header {
+    padding: 18px 22px 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.graph-title {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.50);
+    text-transform: uppercase;
+}
+
+.graph-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 4px;
+}
+
+.graph-trend {
+    font-size: 0.72rem;
+    color: #4ade80;
+    margin-top: 3px;
+}
+
+.chart-area {
+    position: relative;
+    z-index: 2;
+    padding: 0 16px 16px;
+    height: calc(320px - 80px);
+}
+
+/* THOUGHT STRIP */
+.thought-strip {
+    grid-column: 1 / -1;
+    margin: 8px 0;
+    height: 52px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    padding: 0 20px;
+}
+
+.thought-text-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thought-text {
+    position: absolute;
+    font-size: 0.82rem;
+    color: #444444;
+    font-style: italic;
+    letter-spacing: 0.3px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 600ms ease;
+    width: 100%;
+}
+
+.thought-text.active {
+    opacity: 1;
+}
+
+.thought-author {
+    font-style: normal;
+    font-weight: 600;
+    color: #f472b6; /* pink */
+    margin-left: 6px;
+}
+
+.thought-indicator {
+    position: absolute;
+    bottom: 6px;
+    display: flex;
+    gap: 4px;
+}
+
+.thought-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.thought-dot.active {
+    background: #f472b6;
+    transform: scale(1.2);
+}
+
+/* QUADRANT 3 - QUICK ACTIONS */
+.q3-actions {
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    border-radius: 20px;
+    padding: 24px 24px;
+    height: 200px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    position: relative;
+}
+
+.actions-header {
+    font-size: 0.68rem;
+    letter-spacing: 2.5px;
+    color: #aaaaaa;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: 14px;
+    padding: 12px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    width: 100%;
+}
+
+.action-btn.btn-stocks {
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+}
+
+.action-btn.btn-stocks:hover {
+    background: #dcfce7;
+    border-color: #4ade80;
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(74,222,128,0.20);
+}
+
+.action-btn.btn-billing {
+    background: #eff6ff;
+    border: 1.5px solid #93c5fd;
+}
+
+.action-btn.btn-billing:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(96,165,250,0.20);
+}
+
+.action-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.btn-stocks .action-icon { background: #22c55e; color: white; }
+.btn-billing .action-icon { background: #3b82f6; color: white; }
+
+.action-text {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #111111;
+}
+
+.action-arrow {
+    margin-left: auto;
+    font-size: 1rem;
+}
+
+.btn-stocks .action-arrow { color: #22c55e; }
+.btn-billing .action-arrow { color: #3b82f6; }
+
+.analytics-link {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.analytics-link:hover {
+    text-decoration: underline;
+}
+
+/* QUADRANT 4 - CHATBOT */
+.q4-chatbot {
+    background: linear-gradient(145deg, #3730a3 0%, #4338ca 40%, #312e81 100%);
+    border-radius: 20px;
+    height: 200px;
+    box-shadow: 0 4px 24px rgba(49,46,129,0.20);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.q4-chatbot:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(49,46,129,0.30);
+}
+
+.glow-1 {
+    position: absolute;
+    width: 150px; height: 150px;
+    background: rgba(167,139,250,0.15);
+    border-radius: 50%;
+    top: -30px; right: -30px;
+    filter: blur(30px);
+}
+
+.glow-2 {
+    position: absolute;
+    width: 100px; height: 100px;
+    background: rgba(139,92,246,0.12);
+    border-radius: 50%;
+    bottom: -20px; left: -20px;
+    filter: blur(25px);
+}
+
+.chatbot-pill {
+    position: absolute;
+    top: 16px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.8);
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.chatbot-ring {
+    width: 64px; height: 64px;
+    border: 2px solid rgba(167,139,250,0.40);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: pulse 2.5s ease-in-out infinite;
+    margin-top: 10px;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(167,139,250,0.30); }
+    50% { box-shadow: 0 0 0 14px rgba(167,139,250,0); }
+}
+
+.chatbot-inner {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 6px 20px rgba(124,58,237,0.45);
+    font-size: 1.4rem;
+    transition: background 0.3s ease;
+}
+
+.q4-chatbot:hover .chatbot-inner {
+    background: linear-gradient(135deg, #8b5cf6, #c084fc);
+}
+
+.chatbot-text {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.95);
+    letter-spacing: 1.5px;
+    margin-top: 12px;
+}
+
+/* TOAST */
+.chatbot-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1e1b4b;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chatbot-toast.show {
+    animation: fadeInUp 0.4s ease forwards, fadeOut 0.4s ease 2.6s forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(20px); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    .thought-strip {
+        grid-column: 1;
+        height: auto;
+        padding: 14px 20px;
+    }
+    .q1-alerts, .q2-graph {
+        height: 280px;
+    }
+    .chart-area {
+        height: calc(280px - 80px);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+
+    {% if session.user_id == 'guest' %}
+    <div class="guest-banner" style="background: #e0f2fe; color: #0284c7; padding: 12px 20px; border-radius: 8px; margin-bottom: 24px; font-weight: 500; font-size: 0.9rem; text-align: center; border: 1px solid #bae6fd;">
+        <span style="font-size: 1.1rem; vertical-align: middle; margin-right: 8px;">👋</span>
+        Welcome to Guest Mode! Feel free to click 'Load Sample Data' and test out all features.
+    </div>
+    {% endif %}
+    
+    <!-- HEADER CONTROLS -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <button class="btn btn-secondary" id="dashboard-load-sample-btn" style="background: #ffffff; border: 1px solid #ebebeb; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; color: #111; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">Load Sample Data</button>
+    </div>
+
+    <!-- TOP STAT PILLS ROW -->
+    <div class="stat-pills-row">
+        <div class="stat-pill">
+            <span class="label">💰 Today Rev</span>
+            <span class="value" id="today-sales">₹0.00</span>
+            <span class="label" style="margin-top: 6px; color: #22c55e;">📈 Profit</span>
+            <span class="value" style="color: #22c55e; font-size: 0.9rem;" id="today-profit">₹0.00</span>
+        </div>
+        <div class="stat-pill">
+            <span class="label">📅 Weekly Rev</span>
+            <span class="value" id="weekly-sales">₹0.00</span>
+            <span class="label" style="margin-top: 6px; color: #22c55e;">📈 Profit</span>
+            <span class="value" style="color: #22c55e; font-size: 0.9rem;" id="weekly-profit">₹0.00</span>
+        </div>
+        <div class="stat-pill">
+            <span class="label">🗓️ Monthly Rev</span>
+            <span class="value" id="monthly-sales">₹0.00</span>
+            <span class="label" style="margin-top: 6px; color: #22c55e;">📈 Profit</span>
+            <span class="value" style="color: #22c55e; font-size: 0.9rem;" id="monthly-profit">₹0.00</span>
+        </div>
+        <div class="stat-pill">
+            <span class="label">🤖 Predicted</span>
+            <span class="value" id="predicted-sales" style="margin-top: 14px; font-size: 1.3rem;">₹0.00</span>
+        </div>
+    </div>
+
+    <!-- 4 QUADRANTS GRID -->
+    <div class="dashboard-grid">
+        
+        <!-- Q1 SMART ALERTS -->
+        <div class="q1-alerts">
+            <div class="alerts-header">
+                <div class="alerts-icon">🔔</div>
+                <h3 class="alerts-title">SMART ALERTS</h3>
+                <div class="alerts-badge" id="alerts-badge">0 Active</div>
+            </div>
+            <div class="alerts-scroll-area" id="alerts-container">
+                <!-- Alerts injected here -->
+            </div>
+        </div>
+
+        <!-- Q2 WEEKLY GRAPH -->
+        <div class="q2-graph">
+            <div class="graph-header">
+                <div class="graph-title">WEEKLY SALES</div>
+                <div class="graph-value" id="graph-total">₹0.00</div>
+                <div class="graph-trend" id="graph-trend">Loading...</div>
+            </div>
+            <div class="chart-area">
+                <canvas id="weeklySalesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- THOUGHT STRIP -->
+        <div class="thought-strip">
+            <div class="thought-text-wrapper" id="thought-container">
+                <!-- Thoughts injected here -->
+            </div>
+            <div class="thought-indicator" id="thought-dots">
+                <!-- Dots injected here -->
+            </div>
+        </div>
+
+        <!-- Q3 QUICK ACTIONS -->
+        <div class="q3-actions">
+            <a href="/analytics_detail" class="analytics-link">Full Analytics &rarr;</a>
+            <div class="actions-header">QUICK ACTIONS</div>
+            
+            <a href="/stocks" class="action-btn btn-stocks">
+                <div class="action-icon">📦</div>
+                <div class="action-text">Add to Stocks</div>
+                <div class="action-arrow">&rarr;</div>
+            </a>
+
+            <a href="/billing" class="action-btn btn-billing">
+                <div class="action-icon">🧾</div>
+                <div class="action-text">New Bill</div>
+                <div class="action-arrow">&rarr;</div>
+            </a>
+        </div>
+        <div class="q4-insights">
+            <h3>Business Insights</h3>
+    <div class="insight-item">
+        <span>🔥 Top Product</span>
+        <strong id="top-product">Loading...</strong>
+    </div>
+
+    <div class="insight-item">
+        <span>📉 Least Sold</span>
+        <strong id="least-product">Loading...</strong>
+    </div>
+
+    <div class="insight-item">
+        <span>📊 Best Category</span>
+        <strong id="best-category">Loading...</strong>
+    </div>
+</div>
+    </div>
+</div>
+
+<div class="chatbot-toast" id="toast">IBM Watson AI integration coming soon! 🚀</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    // --- THOUGHTS ROTATION ---
+    const thoughts = [
+        { quote: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+        { quote: "Your most unhappy customers are your greatest source of learning.", author: "Bill Gates" },
+        { quote: "Chase the vision, not the money — the money will end up following you.", author: "Tony Hsieh" }
+    ];
+    
+    const thoughtContainer = document.getElementById('thought-container');
+    const thoughtDots = document.getElementById('thought-dots');
+    
+    thoughts.forEach((t, index) => {
+        const textEl = document.createElement('div');
+        textEl.className = `thought-text ${index === 0 ? 'active' : ''}`;
+        textEl.innerHTML = `❝ ${t.quote} <span class="thought-author">— ${t.author}</span>`;
+        thoughtContainer.appendChild(textEl);
+        
+        const dotEl = document.createElement('div');
+        dotEl.className = `thought-dot ${index === 0 ? 'active' : ''}`;
+        thoughtDots.appendChild(dotEl);
+    });
+
+    let currentThought = 0;
+    setInterval(() => {
+        const texts = thoughtContainer.querySelectorAll('.thought-text');
+        const dots = thoughtDots.querySelectorAll('.thought-dot');
+        
+        texts[currentThought].classList.remove('active');
+        dots[currentThought].classList.remove('active');
+        
+        currentThought = (currentThought + 1) % thoughts.length;
+        
+        texts[currentThought].classList.add('active');
+        dots[currentThought].classList.add('active');
+    }, 4000);
+
+    // --- FETCH DASHBOARD DATA ---
+    try {
+        const res = await fetch('/api/dashboard_data');
+        const data = await res.json();
+        
+        // Populate stats pills
+        document.getElementById('today-sales').textContent = '₹' + data.today_revenue.toLocaleString();
+        document.getElementById('today-profit').textContent = '₹' + data.today_profit.toLocaleString();
+        document.getElementById('weekly-sales').textContent = '₹' + data.weekly_revenue.toLocaleString();
+        document.getElementById('weekly-profit').textContent = '₹' + data.weekly_profit.toLocaleString();
+        document.getElementById('monthly-sales').textContent = '₹' + data.monthly_revenue.toLocaleString();
+        document.getElementById('monthly-profit').textContent = '₹' + data.monthly_profit.toLocaleString();
+        document.getElementById('predicted-sales').textContent = '₹' + data.predicted_sales.toLocaleString();
+        
+        document.getElementById('graph-total').textContent = '₹' + data.weekly_revenue.toLocaleString();
+        
+        // Simple trend calculation (mock for visual, could be calculated properly)
+        document.getElementById('graph-trend').textContent = '↑ Trend available soon';
+        
+        // Populate Alerts
+        const alertsContainer = document.getElementById('alerts-container');
+        const badge = document.getElementById('alerts-badge');
+        
+        if (data.alerts && data.alerts.length > 0) {
+            badge.textContent = `${data.alerts.length} Active`;
+            badge.classList.remove('all-clear');
+            alertsContainer.innerHTML = '';
+            
+            data.alerts.forEach((alert, index) => {
+                const item = document.createElement('div');
+                item.className = `alert-item ${alert.type}`;
+                item.style.animationDelay = `${index * 0.08}s`;
+                
+                let icon = '';
+                let sub = '';
+                let title = alert.product;
+                
+                if (alert.type === 'overdue_review') {
+                    icon = '🗑️';
+                    sub = `${alert.quantity} units need immediate review or return`;
+                    title += ' review date passed';
+                } else if (alert.type === 'out_of_stock') {
+                    icon = '🚨';
+                    sub = `Reorder from supplier immediately`;
+                    title += ' is out of stock';
+                } else if (alert.type === 'review_soon') {
+                    icon = '⏰';
+                    sub = `Warranty/review due in ${alert.days_until_expiry} days`;
+                    title += ' review due soon';
+                } else if (alert.type === 'low_stock') {
+                    icon = '⚠️';
+                    sub = `Only ${alert.quantity} units remaining — reorder soon`;
+                    title += ' stock is low';
+                }
+                
+                item.innerHTML = `
+                    <div class="alert-icon-box">${icon}</div>
+                    <div class="alert-text-content">
+                        <div class="alert-title">${title}</div>
+                        <div class="alert-sub">${sub}</div>
+                    </div>
+                `;
+                alertsContainer.appendChild(item);
+            });
+        } else {
+            badge.textContent = `All Clear`;
+            badge.classList.add('all-clear');
+            alertsContainer.innerHTML = `
+                <div class="empty-alerts">
+                    <div style="font-size: 2rem; margin-bottom: 8px;">✅</div>
+                    <div>Everything looks good!</div>
+                </div>
+            `;
+        }
+        
+        // Render Chart
+        if (data.weekly_chart) {
+            const ctx = document.getElementById('weeklySalesChart').getContext('2d');
+            
+            // Create Gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+            gradient.addColorStop(0, 'rgba(255, 107, 107, 0.25)'); // #ff6b6b with opacity
+            gradient.addColorStop(1, 'rgba(255, 107, 107, 0.00)');
+            
+            // Formatter for days
+            const formattedLabels = data.weekly_chart.labels.map(dateStr => {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('en-US', { weekday: 'short' });
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: formattedLabels,
+                    datasets: [{
+                        data: data.weekly_chart.data,
+                        borderColor: '#ff6b6b',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ff6b6b',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.75)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ff8080',
+                            borderColor: '#ff6b6b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: 'rgba(255,255,255,0.40)', font: { size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { 
+                                color: 'rgba(255,255,255,0.40)', 
+                                font: { size: 10 },
+                                callback: function(value) { return '₹' + value; }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+        
+    } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+    }
+
+    // Load Sample Data from Dashboard
+    const loadSampleBtn = document.getElementById('dashboard-load-sample-btn');
+    if (loadSampleBtn) {
+        loadSampleBtn.onclick = async () => {
+            if(confirm('This will delete current data and load sample data. Proceed?')) {
+                try {
+                    await fetch('/api/load_sample_data', { method: 'POST' });
+                    alert('Sample data loaded!');
+                    window.location.reload();
+                } catch(e) {
+                    console.error('Failed to load sample data:', e);
+                }
+            }
+        };
+    }
+});
+
+// Toast functionality
+function showToast() {
+    const toast = document.getElementById('toast');
+    toast.classList.remove('show');
+    // void to force reflow so animation restarts if clicked rapidly
+    void toast.offsetWidth;
+    toast.classList.add('show');
+}
+</script>
+{% endblock %}

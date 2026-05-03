@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+/* Stocks Specific CSS */
+.stocks-wrapper {
+    background: #94b9cb;
+    min-height: 100vh;
+    padding: 80px 32px 60px 32px;
+}
+
+.product-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.emoji-header {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.prod-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 4px;
+}
+
+/* Expiry Badge */
+.expiry-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    margin-top: 4px;
+}
+
+.expiry-badge.overdue {
+    color: #ef4444;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+}
+
+.expiry-badge.soon {
+    color: #f59e0b;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+}
+
+.expiry-badge.safe {
+    color: #22c55e;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+}
+
+/* 3-Column Price Section */
+.price-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.price-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-col.center {
+    align-items: center;
+}
+
+.price-col.right {
+    align-items: flex-end;
+}
+
+.price-label {
+    font-size: 0.62rem;
+    color: #999;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.price-val {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #555555;
+    margin-top: 2px;
+}
+
+.selling-val {
+    color: #111111;
+    font-weight: 700;
+}
+
+.margin-val {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.margin-val.positive { color: #22c55e; }
+.margin-val.negative { color: #ef4444; }
+
+/* Add Stock Button */
+.add-stock-btn {
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    color: #16a34a;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 16px;
+    width: fit-content;
+}
+
+.add-stock-btn:hover {
+    background: #dcfce7;
+}
+
+/* Inline Modal for Add Stock */
+.inline-modal {
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    width: 280px;
+    position: absolute;
+    z-index: 100;
+    display: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.inline-modal.show {
+    display: block;
+    animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -45%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 99;
+    display: none;
+}
+
+.modal-backdrop.show { display: block; }
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #22c55e;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.toast.show { opacity: 1; }
+
+.qty-display {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-display strong {
+    color: #111;
+    font-size: 1.1rem;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stocks-wrapper">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h2>Inventory Management</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Manage your furniture catalog, prices, and stock levels.</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn btn-secondary" id="load-sample-btn">Load Sample Data</button>
+            <button class="btn btn-primary" id="open-add-modal-btn" style="background: #111; color: #fff;">+ Add New Product</button>
+        </div>
+    </div>
+
+    <div id="products-grid" class="grid grid-4">
+        <!-- Products injected here -->
+    </div>
+</div>
+
+<!-- Main Add Product Modal -->
+<div id="product-modal" class="modal-overlay">
+    <div class="glass-panel modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Add New Product</h3>
+            <button class="close-btn" id="close-modal-btn">&times;</button>
+        </div>
+        <form id="product-form">
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Emoji Icon</label>
+                    <input type="text" id="prod-emoji" class="form-control" placeholder="🛋️" value="📦">
+                </div>
+                <div class="form-group" style="flex: 3;">
+                    <label>Product Name</label>
+                    <input type="text" id="prod-name" class="form-control" required>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Cost Price (₹)</label>
+                    <input type="number" id="prod-cost" class="form-control" step="0.01" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Selling Price (₹)</label>
+                    <input type="number" id="prod-price" class="form-control" step="0.01" required>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Quantity</label>
+                    <input type="number" id="prod-qty" class="form-control" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Warranty / Review Date</label>
+                    <input type="date" id="prod-expiry" class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; background: #111; color:#fff;">Save Product</button>
+        </form>
+    </div>
+</div>
+
+<!-- Add Stock Inline Modal Template -->
+<div class="modal-backdrop" id="add-stock-backdrop"></div>
+<div class="inline-modal" id="add-stock-modal">
+    <h4 style="font-size: 0.85rem; font-weight: 600; color: #111; margin-bottom: 14px;" id="add-stock-title">Add Stock</h4>
+    <div style="font-size: 0.78rem; color: #888; margin-bottom: 14px;" id="add-stock-current">Current Qty: 0 units</div>
+    
+    <input type="hidden" id="add-stock-id">
+    
+    <input type="number" id="add-stock-qty" placeholder="Quantity to add" min="1" class="form-control" style="width: 100%; margin-bottom: 10px;">
+    
+    <label style="font-size: 0.8rem; color: #666;">Update Warranty/Review Date (optional)</label>
+    <input type="date" id="add-stock-expiry" class="form-control" style="width: 100%; margin-top: 4px;">
+    
+    <button id="confirm-add-stock" style="background: #22c55e; color: white; width: 100%; padding: 10px; border-radius: 10px; border: none; margin-top: 14px; font-weight: 600; cursor: pointer;">Add to Stock</button>
+    <div style="text-align: center; margin-top: 10px;">
+        <a href="#" id="cancel-add-stock" style="font-size: 0.75rem; color: #888; text-decoration: none;">Cancel</a>
+    </div>
+</div>
+
+<div class="toast" id="success-toast">✓ Stock updated successfully</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Set min date for expiry to today
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('prod-expiry').setAttribute('min', todayStr);
+
+    fetchProducts();
+    
+    // Main Modal logic
+    const modal = document.getElementById('product-modal');
+    document.getElementById('open-add-modal-btn').onclick = () => modal.style.display = 'flex';
+    document.getElementById('close-modal-btn').onclick = () => modal.style.display = 'none';
+    
+    // Form logic
+    document.getElementById('product-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            emoji: document.getElementById('prod-emoji').value || '📦',
+            name: document.getElementById('prod-name').value,
+            selling_price: parseFloat(document.getElementById('prod-price').value),
+            cost_price: parseFloat(document.getElementById('prod-cost').value),
+            quantity: parseInt(document.getElementById('prod-qty').value),
+            expiry_date: document.getElementById('prod-expiry').value
+        };
+        
+        try {
+            const res = await fetch('/api/add_product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                modal.style.display = 'none';
+                e.target.reset();
+                fetchProducts();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+    
+    // Load Sample Data
+    document.getElementById('load-sample-btn').onclick = async () => {
+        if(confirm('This will delete current data and load sample data. Proceed?')) {
+            await fetch('/api/load_sample_data', { method: 'POST' });
+            fetchProducts();
+            alert('Sample data loaded! Go to Dashboard or Analytics to see it in action.');
+        }
+    };
+
+    // Add Stock Modal Logic
+    document.getElementById('add-stock-backdrop').onclick = closeAddStockModal;
+    document.getElementById('cancel-add-stock').onclick = (e) => { e.preventDefault(); closeAddStockModal(); };
+    
+    document.getElementById('confirm-add-stock').onclick = async () => {
+        const id = document.getElementById('add-stock-id').value;
+        const qty = document.getElementById('add-stock-qty').value;
+        const expiry = document.getElementById('add-stock-expiry').value;
+        
+        if (!qty || qty < 1) return alert('Enter a valid quantity');
+        
+        const payload = { quantity: qty };
+        if (expiry) payload.expiry_date = expiry;
+        
+        try {
+            const res = await fetch(`/api/add_stock/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                closeAddStockModal();
+                fetchProducts(); // Refresh grid
+                showToast();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+});
+
+function closeAddStockModal() {
+    document.getElementById('add-stock-modal').classList.remove('show');
+    document.getElementById('add-stock-backdrop').classList.remove('show');
+}
+
+function showToast() {
+    const toast = document.getElementById('success-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function openAddStock(id, name, currentQty) {
+    document.getElementById('add-stock-id').value = id;
+    document.getElementById('add-stock-title').textContent = `Add Stock — ${name}`;
+    document.getElementById('add-stock-current').textContent = `Current Qty: ${currentQty} units`;
+    document.getElementById('add-stock-qty').value = '';
+    document.getElementById('add-stock-expiry').value = '';
+    
+    document.getElementById('add-stock-backdrop').classList.add('show');
+    document.getElementById('add-stock-modal').classList.add('show');
+}
+
+async function fetchProducts() {
+    try {
+        const res = await fetch('/api/products');
+        const products = await res.json();
+        
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = '';
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        products.forEach(p => {
+            // Margin calculation
+            const cost = p.cost_price;
+            const sell = p.selling_price;
+            let margin = 0;
+            if (cost > 0) margin = ((sell - cost) / cost) * 100;
+            const marginStr = margin > 0 ? `+${margin.toFixed(1)}%` : `${margin.toFixed(1)}%`;
+            const marginClass = margin > 0 ? 'positive' : 'negative';
+
+            // Expiry Badge Logic
+            let badgeHtml = '';
+            if (p.expiry_date) {
+                const expiry = new Date(p.expiry_date);
+                const diffTime = expiry - today;
+                const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft < 0) {
+                    badgeHtml = `<div class="expiry-badge overdue">⚠ Review Overdue</div>`;
+                } else if (daysLeft <= 30) {
+                    badgeHtml = `<div class="expiry-badge soon">⚠ Review in ${daysLeft} days</div>`;
+                } else {
+                    const dateStr = expiry.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    badgeHtml = `<div class="expiry-badge safe">✓ Valid till ${dateStr}</div>`;
+                }
+            } else {
+                badgeHtml = `<div class="expiry-badge safe" style="color:#888; border-color:#e0e0e0; background:#f9f9f9;">No date set</div>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            // Check if quantity is low (optional UI cue)
+            let qtyColor = p.quantity === 0 ? '#ef4444' : (p.quantity <= 3 ? '#f59e0b' : '#111');
+            
+            card.innerHTML = `
+                <div class="emoji-header">${p.emoji || '📦'}</div>
+                <div class="prod-title">${p.name}</div>
+                ${badgeHtml}
+                
+                <div class="qty-display">
+                    <strong style="color: ${qtyColor};">${p.quantity}</strong> units in stock
+                </div>
+                
+                <button class="add-stock-btn" onclick="openAddStock(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.quantity})">+ Add Stock</button>
+
+                <div class="price-section">
+                    <div class="price-col">
+                        <span class="price-label">Cost</span>
+                        <span class="price-val">₹${cost.toLocaleString()}</span>
+                    </div>
+                    <div class="price-col center">
+                        <span class="price-label">Margin</span>
+                        <span class="margin-val ${marginClass}">${marginStr}</span>
+                    </div>
+                    <div class="price-col right">
+                        <span class="price-label">Selling</span>
+                        <span class="price-val selling-val">₹${sell.toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+</script>
+{% endblock %}

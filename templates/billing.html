@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='billing.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="no-print" style="margin-bottom: 2rem;">
+    <h2>Smart Billing</h2>
+    <p style="color: var(--text-muted);">Create new bills and manage sales</p>
+</div>
+
+<div class="grid grid-2 no-print">
+    <!-- Billing Form -->
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="margin-bottom: 1.5rem;">Add Items to Bill</h3>
+        <div class="form-group">
+            <label>Customer Name (Optional)</label>
+            <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name">
+        </div>
+        <div class="form-group">
+            <label>Select Product</label>
+            <select id="product-select" class="form-control">
+                <option value="">-- Choose Product --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="quantity-input" class="form-control" value="1" min="1">
+        </div>
+        <button id="add-item-btn" class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">Add to Bill</button>
+    </div>
+
+    <!-- Bill Actions -->
+    <div class="glass-panel" style="padding: 2rem; display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+        <h3 style="text-align: center;">Actions</h3>
+        <button id="save-bill-btn" class="btn btn-primary">Save Bill Only</button>
+        <button id="save-print-btn" class="btn btn-primary" style="background: var(--text-color);">Save & Print Bill</button>
+    </div>
+</div>
+
+<!-- Printable Bill Area -->
+<div id="bill-summary-container" class="glass-panel" style="margin-top: 2rem; padding: 2rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2>BizPlus AI</h2>
+        <p style="color: var(--text-muted);">Tax Invoice / Bill of Supply</p>
+        <p style="color: var(--text-muted); font-size: 0.9rem;" id="print-date"></p>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th class="no-print" style="width: 50px;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="bill-table-body">
+            <!-- Items injected by billing.js -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" style="text-align: right; font-weight: bold; font-size: 1.2rem;">Grand Total:</td>
+                <td colspan="2" id="grand-total" style="font-weight: bold; font-size: 1.2rem; color: var(--primary-color);">₹0.00</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% endblock %}

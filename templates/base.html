@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizPlus AI - Smart Business Assistant</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='print.css') }}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- App JS -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- CSS Cloud Animations -->
+    <div class="clouds-container">
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-brand">BIZPLUS AI</div>
+    </div>
+
+    <!-- Sidebar Panel -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+            <div class="sidebar-shop">{{ session.get('shop_name') or 'BizPlus Store' }}</div>
+            <div class="sidebar-user">@{{ session.get('username') }}</div>
+            <hr class="sidebar-divider">
+        </div>
+        <div class="sidebar-nav">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/stocks">Stocks</a>
+            <a href="/billing">Billing</a>
+            <a href="/bill_history">Bill History</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/analytics_detail">Detailed Analytics</a>
+        </div>
+        <div class="sidebar-bottom">
+            <a href="/logout" class="logout-btn">LOGOUT</a>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content Area -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
