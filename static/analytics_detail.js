@@ -44,7 +44,7 @@ function renderTrending(trending) {
                     <span style="font-size: 1.5rem;">${rankBadge}</span> 
                     ${item.product_name}
                 </h3>
-                <p style="color: var(--text-muted); margin-left: 2.5rem; margin-top: 0.25rem;">
+                <p class="stat-subtext">
                     ${item.total_qty} units sold
                 </p>
             </div>
@@ -66,27 +66,22 @@ function renderLeastSold(leastSold) {
         return;
     }
 
-    leastSold.forEach(item => {
-        // Warning colors
-        const bgColor = 'rgba(239, 68, 68, 0.1)'; // soft red
-        const borderColor = 'rgba(239, 68, 68, 0.3)';
-        
+    leastSold.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'glass-panel stat-card';
-        card.style.background = bgColor;
-        card.style.border = `1px solid ${borderColor}`;
+
         card.innerHTML = `
             <div class="stat-info">
-                <h3 style="color: var(--danger);">
+                <h3 style="color: var(--text-color);">
                     <span style="font-size: 1.5rem;">📉</span> 
                     ${item.product_name}
                 </h3>
-                <p style="color: var(--text-muted); margin-left: 2.5rem; margin-top: 0.25rem;">
+                <p class="stat-subtext">
                     ${item.total_qty} units sold
                 </p>
             </div>
             <div style="text-align: right;">
-                <h3 style="color: var(--text-color);">${item.stock_remaining}</h3>
+                <h3 style="color: var(--primary-color);">${item.stock_remaining}</h3>
                 <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">In Stock</span>
             </div>
         `;

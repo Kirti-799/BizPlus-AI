@@ -105,7 +105,7 @@
     .chart-container {
         width: 100%;
         max-width: 1000px;
-        background: rgba(255,255,255,0.7);
+        background: #ffffff;
         backdrop-filter: blur(10px);
         border-radius: 16px;
         padding: 2rem;
@@ -123,7 +123,7 @@
     <!-- Section 1: Trending -->
     <section class="analytics-section reveal" id="top">
         <h2 class="section-title">Trending Items</h2>
-        <p style="color: var(--text-muted); margin-top: 1rem;">Top 5 best-selling products this month.</p>
+        <p class="section-subtext">Top 5 best-selling products this month</p>
         <div class="stat-list" id="trending-container">
             <p>Loading trending data...</p>
         </div>
@@ -132,7 +132,7 @@
     <!-- Section 2: Least Sold -->
     <section class="analytics-section reveal">
         <h2 class="section-title">Least Sold Items</h2>
-        <p style="color: var(--text-muted); margin-top: 1rem;">Products needing attention (lowest sales volume).</p>
+        <p class="section-subtext">Products needing attention (lowest sales volume)</p>
         <div class="stat-list" id="least-sold-container">
             <p>Loading least sold data...</p>
         </div>
@@ -141,7 +141,7 @@
     <!-- Section 3: Monthly Sales -->
     <section class="analytics-section reveal">
         <h2 class="section-title">Monthly Sales Trend</h2>
-        <p style="color: var(--text-muted); margin-top: 1rem;">Daily revenue over the last 30 days.</p>
+        <p class="section-subtext">Daily revenue over the last 30 days</p>
         <div class="chart-container">
             <canvas id="monthlyChartDetail"></canvas>
         </div>
@@ -150,7 +150,7 @@
     <!-- Section 4: Weekly Sales -->
     <section class="analytics-section reveal" style="padding-bottom: 4rem;">
         <h2 class="section-title">Weekly Performance</h2>
-        <p style="color: var(--text-muted); margin-top: 1rem;">Revenue over the past 7 days.</p>
+        <p class="section-subtext">Revenue over the past 7 days</p>
         <div class="chart-container">
             <canvas id="weeklyChartDetail"></canvas>
         </div>
